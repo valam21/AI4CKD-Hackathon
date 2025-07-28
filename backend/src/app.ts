@@ -1,13 +1,14 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import db from './config/db'; // Importez le pool de connexion
+import db from './config/db';
+import patientRoutes from './routes/patientRoutes'; // Importez vos routes patient
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(express.json());
+app.use(express.json()); // Middleware pour parser le JSON
 
 // Test de connexion à la base de données au démarrage
 db.query('SELECT NOW()', (err, res) => {
@@ -17,6 +18,9 @@ db.query('SELECT NOW()', (err, res) => {
     console.log('Connexion à la base de données réussie. Heure actuelle:', res.rows[0].now);
   }
 });
+
+// Utilisation des routes
+app.use('/api/patients', patientRoutes); // Toutes les routes des patients commenceront par /api/patients
 
 app.get('/', (req, res) => {
   res.send('API AI4CKD Hackathon en cours d\'exécution !');
