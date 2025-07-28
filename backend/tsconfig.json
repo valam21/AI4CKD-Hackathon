@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2020",                             /* Spécifie la version ECMAScript cible. */
+    "module": "commonjs",                           /* Spécifie la stratégie de génération de module. */
+    "rootDir": "./src",                             /* Spécifie le répertoire racine des fichiers source. */
+    "outDir": "./dist",                             /* Spécifie le répertoire de sortie pour la compilation. */
+    "esModuleInterop": true,                        /* Active l'interopérabilité pour les modules CommonJS et ES. */
+    "forceConsistentCasingInFileNames": true,       /* Applique une casse cohérente pour les noms de fichiers. */
+    "strict": true,                                 /* Active tous les contrôles de type stricts. */
+    "skipLibCheck": true,                           /* Saute la vérification des fichiers de déclaration de bibliothèques. */
+    "resolveJsonModule": true,                      /* Permet l'importation de modules .json. */
+    "sourceMap": true                               /* Génère des fichiers .map pour le débogage. */
+  },
+  "include": ["src/**/*.ts"],                       /* Spécifie les fichiers à inclure. */
+  "exclude": ["node_modules"]                       /* Spécifie les fichiers à exclure. */
+}
