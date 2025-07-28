@@ -11,6 +11,7 @@ export default function AddPatientPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +19,7 @@ export default function AddPatientPage() {
     setError(null);
 
     try {
-      const res = await fetch('http://localhost:5000/api/patients', {
+      const res = await fetch(`${BACKEND_URL}/api/patients`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

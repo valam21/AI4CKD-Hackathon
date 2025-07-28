@@ -15,11 +15,12 @@ export default function PatientsPage() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/patients'); // Assurez-vous que le backend tourne sur le port 5000
+        const res = await fetch(`${BACKEND_URL}/api/patients`); // Assurez-vous que le backend tourne sur le port 5000
         if (!res.ok) {
           throw new Error(`Erreur HTTP: ${res.status}`);
         }

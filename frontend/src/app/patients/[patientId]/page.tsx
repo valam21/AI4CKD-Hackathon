@@ -45,6 +45,7 @@ export default function PatientDetailPage() {
   const [patientData, setPatientData] = useState<PatientDetailData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
   // États pour la nouvelle consultation
   const [newConsultation, setNewConsultation] = useState({
@@ -70,7 +71,7 @@ export default function PatientDetailPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`http://localhost:5000/api/patients/${patientId}`);
+      const res = await fetch(`${BACKEND_URL}/api/patients/${patientId}`);
       if (!res.ok) {
         throw new Error(`Erreur HTTP: ${res.status}`);
       }
@@ -91,7 +92,7 @@ export default function PatientDetailPage() {
     setConsultationSuccess(null);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/patients/${patientId}/consultations`, {
+      const res = await fetch(`${BACKEND_URL}/api/patients/${patientId}/consultations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +136,7 @@ export default function PatientDetailPage() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:5000/api/patients/${patientId}/pdf`);
+      const res = await fetch(`${BACKEND_URL}/api/patients/${patientId}/pdf`);
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || `Erreur HTTP: ${res.status}`);
