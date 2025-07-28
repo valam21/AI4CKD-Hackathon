@@ -5,6 +5,7 @@ import { Consultation } from '../models/Consultation';
 import { Alert } from '../models/Alert';
 import { evaluateConsultationForAlerts } from '../services/alertService'; // Importer le service d'alertes
 import { QueryResult } from 'pg';
+import { generatePatientPdf } from '../services/pdfGeneratorService'; // Importez le service de génération PDF
 
 // Créer un nouveau patient
 export const createPatient = async (req: Request, res: Response) => {
@@ -114,5 +115,47 @@ export const addConsultation = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Erreur lors de l\'ajout de la consultation:', error);
     res.status(500).json({ message: 'Erreur serveur lors de l\'ajout de la consultation.' });
+  }
+};
+
+// Fonction pour exporter le dossier patient en PDF
+export const exportPatientPdf = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Récupérer les informations du patient
+    const patientResult: QueryResult<Patient> = await db.query(
+      'SELECT * FROM patients WHERE id = $1;',
+      [id]
+    );
+    if (patientResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Patient non trouvé.' });
+    }
+    const patient = patientResult.rows[0];
+
+    // Récupérer les consultations du patient
+    const consultationsResult: QueryResult<Consultation> = await db.query(
+      'SELECT * FROM consultations WHERE patient_id = $1 ORDER BY date_consultation DESC;',
+      [id]
+    );
+    const consultations = consultationsResult.rows;
+
+    // Récupérer les alertes du patient (actives ou non, selon le besoin du PDF)
+    const alertsResult: QueryResult<Alert> = await db.query(
+      'SELECT * FROM alerts WHERE patient_id = $1 ORDER BY date_declenchement DESC;', // Vous pouvez filtrer par statut='active' si besoin
+      [id]
+    );
+    const alerts = alertsResult.rows;
+
+    // Générer le PDF
+    const pdfBuffer = await generatePatientPdf(patient, consultations, alerts);
+
+    // Définir les headers pour le téléchargement du fichier
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=dossier_patient_${patient.nom}_${patient.prenom}.pdf`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Erreur lors de la génération du PDF:', error);
+    res.status(500).json({ message: 'Erreur serveur lors de la génération du PDF.' });
   }
 };

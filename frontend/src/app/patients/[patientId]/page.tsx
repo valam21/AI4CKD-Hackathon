@@ -130,27 +130,32 @@ export default function PatientDetailPage() {
   };
 
   const handlePdfExport = async () => {
+    if (!patientId || !patientData?.patient) {
+      alert('Impossible de générer le PDF : informations patient manquantes.');
+      return;
+    }
     try {
-      // Ceci est une URL fictive pour l'export PDF, à implémenter côté backend dans la Phase 4
-      // Pour l'instant, on peut simuler un téléchargement ou afficher un message
-      alert('La génération PDF est une fonctionnalité à implémenter dans la Phase 4. Elle téléchargera un PDF ici.');
+      const res = await fetch(`http://localhost:5000/api/patients/${patientId}/pdf`);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || `Erreur HTTP: ${res.status}`);
+      }
 
-      // Exemple si vous aviez un endpoint PDF prêt
-      // const res = await fetch(`http://localhost:5000/api/patients/${patientId}/pdf`);
-      // if (!res.ok) {
-      //   throw new Error(`Erreur HTTP: ${res.status}`);
-      // }
-      // const blob = await res.blob();
-      // const url = window.URL.createObjectURL(blob);
-      // const a = document.createElement('a');
-      // a.href = url;
-      // a.download = `dossier_patient_${patientData?.patient.nom}_${patientData?.patient.prenom}.pdf`;
-      // document.body.appendChild(a);
-      // a.click();
-      // a.remove();
-    } catch (err) {
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dossier_patient_${patientData.patient.nom}_${patientData.patient.prenom}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url); // Libérer l'URL de l'objet
+
+      alert('Le PDF a été généré et téléchargé avec succès !');
+
+    } catch (err: any) {
       console.error('Erreur lors de l\'exportation PDF:', err);
-      alert('Erreur lors de l\'exportation PDF.');
+      alert(`Erreur lors de l\'exportation PDF : ${err.message}`);
     }
   };
 
