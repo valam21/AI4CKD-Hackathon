@@ -91,6 +91,16 @@ L'application suit une architecture client-serveur standard :
 * **Backend (Node.js/Express)** : Fournit une API RESTful pour la gestion des données (patients, consultations, alertes, utilisateurs). Il interagit avec la base de données PostgreSQL, contient la logique métier (calcul d'alertes) et gère l'authentification.
 * **Base de Données (PostgreSQL)** : Stocke toutes les données de l'application (informations patients, consultations, alertes et utilisateurs).
 
+```bash
++----------------+       +-------------------+       +--------------------+
+|                |       |                   |       |                    |
+|    Frontend    | ----> |      Backend      | ----> |     PostgreSQL     |
+|  (Next.js/TS)  |       | (Node.js/Express) |       |     Database       |
+|                |       |                   |       |                    |
++----------------+       +-------------------+       +--------------------+
+Browser / User           REST API / Logic          Data Storage
+```
+
 ## 5. Pré-requis
 
 Avant de commencer, assurez-vous d'avoir installé les éléments suivants sur votre machine :
