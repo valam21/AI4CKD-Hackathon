@@ -1,7 +1,8 @@
+// src/app/patients/[patientId]/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation'; // Importez useRouter
+import { useParams, useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { useAuth } from '../../../context/auth-context';
 
@@ -44,11 +45,11 @@ interface PatientDetailData {
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
 export default function PatientDetailPage() {
-  const { isAuthenticated, isLoading, token } = useAuth(); // Récupérez l'état d'auth
+  const { isAuthenticated, isLoading, token } = useAuth();
   const router = useRouter();
   const { patientId } = useParams();
   const [patientData, setPatientData] = useState<PatientDetailData | null>(null);
-  const [loadingData, setLoadingData] = useState<boolean>(true); // Renommé
+  const [loadingData, setLoadingData] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const [newConsultation, setNewConsultation] = useState({
@@ -75,7 +76,7 @@ export default function PatientDetailPage() {
     if (patientId) {
       fetchPatientDetails();
     }
-  }, [patientId, isAuthenticated, isLoading, router, token]); // Ajoutez token ici
+  }, [patientId, isAuthenticated, isLoading, router, token]);
 
   const fetchPatientDetails = async () => {
     setLoadingData(true);
@@ -83,7 +84,7 @@ export default function PatientDetailPage() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/patients/${patientId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`, // Incluez le token
+          'Authorization': `Bearer ${token}`,
         },
       });
       if (!res.ok) {
@@ -95,8 +96,14 @@ export default function PatientDetailPage() {
       }
       const data: PatientDetailData = await res.json();
       setPatientData(data);
-    } catch (err: any) {
-      setError(`Impossible de charger les détails du patient: ${err.message}`);
+    } catch (err: unknown) { // Changé 'any' en 'unknown'
+      let errorMessage = "Une erreur inconnue est survenue.";
+      if (err instanceof Error) {
+        errorMessage = `Impossible de charger les détails du patient: ${err.message}`;
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        errorMessage = `Impossible de charger les détails du patient: ${String((err as { message: unknown }).message)}`;
+      }
+      setError(errorMessage);
       console.error(err);
     } finally {
       setLoadingData(false);
@@ -114,7 +121,7 @@ export default function PatientDetailPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Incluez le token
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           creatinine: parseFloat(newConsultation.creatinine),
@@ -141,8 +148,14 @@ export default function PatientDetailPage() {
         date_consultation: format(new Date(), 'yyyy-MM-dd\'T\'HH:mm'),
       });
       fetchPatientDetails();
-    } catch (err: any) {
-      setConsultationError(`Erreur lors de l'ajout de la consultation: ${err.message}`);
+    } catch (err: unknown) { // Changé 'any' en 'unknown'
+      let errorMessage = "Une erreur inconnue est survenue.";
+      if (err instanceof Error) {
+        errorMessage = `Erreur lors de l&apos;ajout de la consultation: ${err.message}`; // Échappement de l'apostrophe
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        errorMessage = `Erreur lors de l&apos;ajout de la consultation: ${String((err as { message: unknown }).message)}`; // Échappement de l'apostrophe
+      }
+      setConsultationError(errorMessage);
       console.error(err);
     } finally {
       setIsSubmittingConsultation(false);
@@ -151,13 +164,14 @@ export default function PatientDetailPage() {
 
   const handlePdfExport = async () => {
     if (!patientId || !patientData?.patient) {
-      alert('Impossible de générer le PDF : informations patient manquantes.');
+      // Remplacé alert par une gestion d'erreur plus douce pour l'utilisateur
+      setConsultationError('Impossible de générer le PDF : informations patient manquantes.');
       return;
     }
     try {
       const res = await fetch(`${BACKEND_URL}/api/patients/${patientId}/pdf`, {
         headers: {
-          'Authorization': `Bearer ${token}`, // Incluez le token
+          'Authorization': `Bearer ${token}`,
         },
       });
       if (!res.ok) {
@@ -175,16 +189,23 @@ export default function PatientDetailPage() {
       a.remove();
       window.URL.revokeObjectURL(url);
 
-      alert('Le PDF a été généré et téléchargé avec succès !');
+      // Remplacé alert par une gestion de succès plus douce pour l'utilisateur
+      setConsultationSuccess('Le PDF a été généré et téléchargé avec succès !');
 
-    } catch (err: any) {
+    } catch (err: unknown) { // Changé 'any' en 'unknown'
+      let errorMessage = "Une erreur inconnue est survenue.";
+      if (err instanceof Error) {
+        errorMessage = `Erreur lors de l&apos;exportation PDF : ${err.message}`; // Échappement de l'apostrophe
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        errorMessage = `Erreur lors de l&apos;exportation PDF : ${String((err as { message: unknown }).message)}`; // Échappement de l'apostrophe
+      }
       console.error('Erreur lors de l\'exportation PDF:', err);
-      alert(`Erreur lors de l\'exportation PDF : ${err.message}`);
+      setConsultationError(errorMessage);
     }
   };
 
   if (isLoading || !isAuthenticated) {
-    return <p className="text-center text-gray-600">Chargement de l'authentification...</p>;
+    return <p className="text-center text-gray-600">Chargement de l&apos;authentification...</p>; // Échappement de l'apostrophe
   }
 
   if (loadingData) return <p className="text-center text-gray-600">Chargement des détails du patient...</p>;

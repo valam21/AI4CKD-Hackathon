@@ -1,3 +1,4 @@
+// src/app/patients/new/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -52,8 +53,14 @@ export default function AddPatientPage() {
       }
 
       router.push('/patients');
-    } catch (err: any) {
-      setError(`Erreur lors de l'ajout du patient: ${err.message}`);
+    } catch (err: unknown) { // Changé 'any' en 'unknown'
+      let errorMessage = "Une erreur inconnue est survenue.";
+      if (err instanceof Error) {
+        errorMessage = `Erreur lors de l&apos;ajout du patient: ${err.message}`; // Échappement de l'apostrophe et message mis à jour
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        errorMessage = `Erreur lors de l&apos;ajout du patient: ${String((err as { message: unknown }).message)}`; // Échappement de l'apostrophe et message mis à jour
+      }
+      setError(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);
@@ -61,11 +68,10 @@ export default function AddPatientPage() {
   };
 
   if (isLoading || !isAuthenticated) {
-    return <p className="text-center text-gray-600">Chargement de l'authentification...</p>;
+    return <p className="text-center text-gray-600">Chargement de l&apos;authentification...</p>; // Échappement de l'apostrophe
   }
 
   return (
-    // ... (Reste du code du composant AddPatientPage inchangé) ...
     <div className="py-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Ajouter un nouveau Patient</h1>
       <div className="bg-white shadow-md rounded-lg p-6">

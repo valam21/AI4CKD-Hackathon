@@ -1,3 +1,5 @@
+// src/app/login/page.tsx
+
 'use client';
 
 import { useState } from 'react';
@@ -36,9 +38,16 @@ export default function LoginPage() {
 
       const data = await res.json();
       login(data.token, data.user);
-      // Redirection vers la page des patients est déjà gérée par login()
-    } catch (err: any) {
-      setError(`Erreur lors de la connexion: ${err.message}`);
+      // La redirection vers la page des patients est déjà gérée par login()
+    } catch (err: unknown) { // Changé 'any' en 'unknown' pour une meilleure sécurité de type
+      let errorMessage = "Une erreur inconnue est survenue.";
+      if (err instanceof Error) {
+        errorMessage = `Erreur lors de la connexion: ${err.message}`;
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        // Fallback pour les objets non-Error qui pourraient avoir une propriété message
+        errorMessage = `Erreur lors de la connexion: ${String((err as { message: unknown }).message)}`;
+      }
+      setError(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);

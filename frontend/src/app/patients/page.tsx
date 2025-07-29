@@ -1,3 +1,4 @@
+// src/app/patients/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -48,8 +49,14 @@ export default function PatientsPage() {
         }
         const data: Patient[] = await res.json();
         setPatients(data);
-      } catch (err: any) {
-        setError(`Impossible de charger les patients: ${err.message}`);
+      } catch (err: unknown) { // Changé 'any' en 'unknown'
+        let errorMessage = "Une erreur inconnue est survenue.";
+        if (err instanceof Error) {
+          errorMessage = `Impossible de charger les patients: ${err.message}`;
+        } else if (typeof err === 'object' && err !== null && 'message' in err) {
+          errorMessage = `Impossible de charger les patients: ${String((err as { message: unknown }).message)}`;
+        }
+        setError(errorMessage);
         console.error(err);
       } finally {
         setLoadingData(false);
@@ -61,7 +68,7 @@ export default function PatientsPage() {
 
   if (isLoading || !isAuthenticated) {
     // Affiche un état de chargement ou rien en attendant la redirection
-    return <p className="text-center text-gray-600">Chargement de l'authentification...</p>;
+    return <p className="text-center text-gray-600">Chargement de l&apos;authentification...</p>;
   }
 
   if (loadingData) return <p className="text-center text-gray-600">Chargement des patients...</p>;
@@ -79,9 +86,9 @@ export default function PatientsPage() {
     <div className="py-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Liste des Patients</h1>
       <div className="flex justify-end mb-4">
-         <Link href="/patients/new" className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
+          <Link href="/patients/new" className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
             Ajouter un nouveau patient
-        </Link>
+          </Link>
       </div>
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="min-w-full leading-normal">
