@@ -108,6 +108,7 @@ Suivez ces étapes pour configurer et lancer le projet localement.
 ```bash
 git clone [https://github.com/votre-utilisateur/AI4CKD-Hackathon.git](https://github.com/votre-utilisateur/AI4CKD-Hackathon.git)
 cd AI4CKD-Hackathon
+```
 
 ### Configuration de la Base de Données (PostgreSQL)
 
