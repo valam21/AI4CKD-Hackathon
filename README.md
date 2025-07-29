@@ -98,7 +98,7 @@ L'application suit une architecture client-serveur standard :
 |  (Next.js/TS)  |       | (Node.js/Express) |       |     Database       |
 |                |       |                   |       |                    |
 +----------------+       +-------------------+       +--------------------+
-Browser / User           REST API / Logic             Data Storage
+Browser / User           REST API / Logic            Data Storage
 ```
 
 ## 5. Pré-requis
@@ -283,7 +283,6 @@ Les contributions sont les bienvenues ! Pour toute suggestion ou amélioration, 
 ## 13. Auteurs
 
 * Ruthus ALLOGNON
-* ...
 
 ## 14. Licence
 
