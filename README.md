@@ -98,7 +98,7 @@ L'application suit une architecture client-serveur standard :
 |  (Next.js/TS)  |       | (Node.js/Express) |       |     Database       |
 |                |       |                   |       |                    |
 +----------------+       +-------------------+       +--------------------+
-Browser / User           REST API / Logic          Data Storage
+Browser / User           REST API / Logic             Data Storage
 ```
 
 ## 5. Pré-requis
@@ -217,8 +217,8 @@ Vous devrez lancer le backend et le frontend séparément.
 
 ## 8. Déploiement
 
-* **Frontend (Next.js)** : Peut être déployé facilement sur des plateformes comme [Vercel](https://vercel.com/). Assurez-vous de configurer la variable d'environnement `NEXT_PUBLIC_BACKEND_URL` pour pointer vers l'URL de votre backend déployé.
-* **Backend (Node.js/Express)** : Peut être déployé sur des services comme [Render](https://render.com/), [Heroku](https://www.heroku.com/), ou un VPS. Configurez les variables d'environnement (`DATABASE_URL`, `JWT_SECRET`) sur la plateforme d'hébergement.
+* **Frontend (Next.js)** : Est déployé sur la plateformes [Vercel](https://vercel.com/).
+* **Backend (Node.js/Express)** : Est déployé sur le service [Render](https://render.com/).
 
 ## 9. Structure du Dépôt
 ```bash
@@ -262,7 +262,7 @@ AI4CKD-Hackathon/
 
 ## 10. Livrables (Hackathon)
 
-* **Lien d'accès au prototype hébergé en ligne** : [À insérer après le déploiement]
+* **Lien d'accès au prototype hébergé en ligne** : https://ai-4-ckd-hackathon.vercel.app/
 * **Dépôt Git complet et commenté** : Ce dépôt lui-même.
 * **Vidéo de démonstration (2 à 4 minutes)** : Mettant en évidence l'enregistrement/connexion, l'ajout de patient, l'ajout de consultation avec déclenchement d'alerte, et la génération PDF.
 * **Présentation synthétique** : Document ou slides résumant les aspects clés du projet.
@@ -282,8 +282,7 @@ Les contributions sont les bienvenues ! Pour toute suggestion ou amélioration, 
 
 ## 13. Auteurs
 
-* [Votre Nom / Nom de l'Équipe 1]
-* [Votre Nom / Nom de l'Équipe 2]
+* Ruthus ALLOGNON
 * ...
 
 ## 14. Licence
