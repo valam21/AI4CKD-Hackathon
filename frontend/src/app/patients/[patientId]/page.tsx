@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { format } from 'date-fns'; // Pour formater les dates
+import { useParams, useRouter } from 'next/navigation'; // Importez useRouter
+import { format } from 'date-fns';
+import { useAuth } from '../../../context/auth-context';
 
 // Définitions d'interfaces pour les données
 interface Patient {
@@ -40,21 +41,23 @@ interface PatientDetailData {
   alerts: Alert[];
 }
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+
 export default function PatientDetailPage() {
+  const { isAuthenticated, isLoading, token } = useAuth(); // Récupérez l'état d'auth
+  const router = useRouter();
   const { patientId } = useParams();
   const [patientData, setPatientData] = useState<PatientDetailData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingData, setLoadingData] = useState<boolean>(true); // Renommé
   const [error, setError] = useState<string | null>(null);
-  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
-  // États pour la nouvelle consultation
   const [newConsultation, setNewConsultation] = useState({
     creatinine: '',
     tension_arterielle_systolique: '',
     tension_arterielle_diastolique: '',
     poids: '',
     notes_cliniques: '',
-    date_consultation: format(new Date(), 'yyyy-MM-dd\'T\'HH:mm'), // Format pour input datetime-local
+    date_consultation: format(new Date(), 'yyyy-MM-dd\'T\'HH:mm'),
   });
   const [isSubmittingConsultation, setIsSubmittingConsultation] = useState(false);
   const [consultationError, setConsultationError] = useState<string | null>(null);
@@ -62,17 +65,32 @@ export default function PatientDetailPage() {
 
 
   useEffect(() => {
+    if (isLoading) return;
+
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+
     if (patientId) {
       fetchPatientDetails();
     }
-  }, [patientId]);
+  }, [patientId, isAuthenticated, isLoading, router, token]); // Ajoutez token ici
 
   const fetchPatientDetails = async () => {
-    setLoading(true);
+    setLoadingData(true);
     setError(null);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/patients/${patientId}`);
+      const res = await fetch(`${BACKEND_URL}/api/patients/${patientId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Incluez le token
+        },
+      });
       if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+             router.push('/login?message=session_expired');
+             return;
+        }
         throw new Error(`Erreur HTTP: ${res.status}`);
       }
       const data: PatientDetailData = await res.json();
@@ -81,7 +99,7 @@ export default function PatientDetailPage() {
       setError(`Impossible de charger les détails du patient: ${err.message}`);
       console.error(err);
     } finally {
-      setLoading(false);
+      setLoadingData(false);
     }
   };
 
@@ -96,6 +114,7 @@ export default function PatientDetailPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Incluez le token
         },
         body: JSON.stringify({
           creatinine: parseFloat(newConsultation.creatinine),
@@ -113,7 +132,7 @@ export default function PatientDetailPage() {
       }
 
       setConsultationSuccess('Consultation ajoutée avec succès et alertes évaluées !');
-      setNewConsultation({ // Réinitialise le formulaire
+      setNewConsultation({
         creatinine: '',
         tension_arterielle_systolique: '',
         tension_arterielle_diastolique: '',
@@ -121,7 +140,7 @@ export default function PatientDetailPage() {
         notes_cliniques: '',
         date_consultation: format(new Date(), 'yyyy-MM-dd\'T\'HH:mm'),
       });
-      fetchPatientDetails(); // Recharger les données pour afficher la nouvelle consultation et les alertes
+      fetchPatientDetails();
     } catch (err: any) {
       setConsultationError(`Erreur lors de l'ajout de la consultation: ${err.message}`);
       console.error(err);
@@ -136,7 +155,11 @@ export default function PatientDetailPage() {
       return;
     }
     try {
-      const res = await fetch(`${BACKEND_URL}/api/patients/${patientId}/pdf`);
+      const res = await fetch(`${BACKEND_URL}/api/patients/${patientId}/pdf`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Incluez le token
+        },
+      });
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || `Erreur HTTP: ${res.status}`);
@@ -150,7 +173,7 @@ export default function PatientDetailPage() {
       document.body.appendChild(a);
       a.click();
       a.remove();
-      window.URL.revokeObjectURL(url); // Libérer l'URL de l'objet
+      window.URL.revokeObjectURL(url);
 
       alert('Le PDF a été généré et téléchargé avec succès !');
 
@@ -160,7 +183,11 @@ export default function PatientDetailPage() {
     }
   };
 
-  if (loading) return <p className="text-center text-gray-600">Chargement des détails du patient...</p>;
+  if (isLoading || !isAuthenticated) {
+    return <p className="text-center text-gray-600">Chargement de l'authentification...</p>;
+  }
+
+  if (loadingData) return <p className="text-center text-gray-600">Chargement des détails du patient...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
   if (!patientData) return <p className="text-center text-gray-600">Patient non trouvé.</p>;
 

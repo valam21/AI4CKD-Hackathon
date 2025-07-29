@@ -1,27 +1,49 @@
-'use client'; // Ce composant est un Client Component car il utilise des hooks ou des événements côté client
+'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '../../context/auth-context'; // Importez useAuth
+import { useRouter } from 'next/navigation'; // Importez useRouter
 
 interface Patient {
   id: number;
   nom: string;
   prenom: string;
-  date_naissance: string; // ISO string
+  date_naissance: string;
   antecedents_medicaux?: string;
 }
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+
 export default function PatientsPage() {
+  const { isAuthenticated, isLoading, token } = useAuth(); // Récupérez l'état d'auth
+  const router = useRouter();
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingData, setLoadingData] = useState<boolean>(true); // Renommé pour éviter la confusion
   const [error, setError] = useState<string | null>(null);
-  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
   useEffect(() => {
+    if (isLoading) return; // Attendre que l'état d'auth soit chargé
+
+    if (!isAuthenticated) {
+      router.push('/login'); // Redirige si non authentifié
+      return;
+    }
+
     const fetchPatients = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/patients`); // Assurez-vous que le backend tourne sur le port 5000
+        const res = await fetch(`${BACKEND_URL}/api/patients`, {
+          headers: {
+            'Authorization': `Bearer ${token}`, // Incluez le token
+          },
+        });
         if (!res.ok) {
+          // Gérer les erreurs spécifiques d'authentification ou de serveur
+          if (res.status === 401 || res.status === 403) {
+             // Si le token est invalide ou expiré, déconnecter l'utilisateur
+             router.push('/login?message=session_expired');
+             return;
+          }
           throw new Error(`Erreur HTTP: ${res.status}`);
         }
         const data: Patient[] = await res.json();
@@ -30,14 +52,19 @@ export default function PatientsPage() {
         setError(`Impossible de charger les patients: ${err.message}`);
         console.error(err);
       } finally {
-        setLoading(false);
+        setLoadingData(false);
       }
     };
 
     fetchPatients();
-  }, []);
+  }, [isAuthenticated, isLoading, router, token]); // Dépendances pour useEffect
 
-  if (loading) return <p className="text-center text-gray-600">Chargement des patients...</p>;
+  if (isLoading || !isAuthenticated) {
+    // Affiche un état de chargement ou rien en attendant la redirection
+    return <p className="text-center text-gray-600">Chargement de l'authentification...</p>;
+  }
+
+  if (loadingData) return <p className="text-center text-gray-600">Chargement des patients...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
   if (patients.length === 0) return (
     <div className="text-center py-10">

@@ -1,17 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../../context/auth-context'; // Importez useAuth
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
 export default function AddPatientPage() {
+  const { isAuthenticated, isLoading, token } = useAuth(); // Récupérez l'état d'auth
+  const router = useRouter();
+
   const [nom, setNom] = useState('');
   const [prenom, setPrenom] = useState('');
   const [dateNaissance, setDateNaissance] = useState('');
   const [antecedentsMedicaux, setAntecedentsMedicaux] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +36,7 @@ export default function AddPatientPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Incluez le token
         },
         body: JSON.stringify({
           nom,
@@ -37,7 +51,7 @@ export default function AddPatientPage() {
         throw new Error(errorData.message || `Erreur HTTP: ${res.status}`);
       }
 
-      router.push('/patients'); // Redirige vers la liste des patients
+      router.push('/patients');
     } catch (err: any) {
       setError(`Erreur lors de l'ajout du patient: ${err.message}`);
       console.error(err);
@@ -46,7 +60,12 @@ export default function AddPatientPage() {
     }
   };
 
+  if (isLoading || !isAuthenticated) {
+    return <p className="text-center text-gray-600">Chargement de l'authentification...</p>;
+  }
+
   return (
+    // ... (Reste du code du composant AddPatientPage inchangé) ...
     <div className="py-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Ajouter un nouveau Patient</h1>
       <div className="bg-white shadow-md rounded-lg p-6">
