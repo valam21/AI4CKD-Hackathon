@@ -106,7 +106,7 @@ Browser / User           REST API / Logic          Data Storage
 Avant de commencer, assurez-vous d'avoir installé les éléments suivants sur votre machine :
 
 * [Node.js](https://nodejs.org/en/download/) (v18 ou plus récent recommandé)
-* [pnpm](https://pnpm.io/installation) (Gestionnaire de paquets, recommandé, mais npm ou yarn fonctionnent aussi)
+* [npm](https://www.npmjs.com/get-npm) (Gestionnaire de paquets, recommandé, normalement installé avec Node.js mais pnpm ou yarn fonctionnent aussi)
 * [PostgreSQL](https://www.postgresql.org/download/) (Base de données)
 
 ## 6. Installation et Démarrage
@@ -116,7 +116,7 @@ Suivez ces étapes pour configurer et lancer le projet localement.
 ### Cloner le Dépôt
 
 ```bash
-git clone [https://github.com/votre-utilisateur/AI4CKD-Hackathon.git](https://github.com/votre-utilisateur/AI4CKD-Hackathon.git)
+git clone https://github.com/valam21/AI4CKD-Hackathon.git
 cd AI4CKD-Hackathon
 ```
 
@@ -167,8 +167,8 @@ Vous devez créer la base de données et les tables nécessaires.
 3.  **Créez un fichier d'environnement `.env`** à la racine du dossier `backend` et configurez vos variables :
     ```env
     PORT=5000
-    DATABASE_URL="postgresql://votre_utilisateur_postgres:votre_mot_de_passe_postgres@localhost:5432/ai4ckd_db"
-    JWT_SECRET="une_cle_secrete_tres_longue_et_aleatoire_pour_jwt" # Changez ceci en production !
+    DATABASE_URL="postgresql://postgres:root@localhost:5432/ai4ckd_db"
+    JWT_SECRET="11aac09ac535a3ddf918f936aa43e61c096ac9e7040684b2ebdc12f9dadbc423"
     ```
 
 ### Configuration du Frontend
