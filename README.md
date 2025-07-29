@@ -211,6 +211,7 @@ Vous devrez lancer le backend et le frontend séparément.
 * **Backend (Node.js/Express)** : Peut être déployé sur des services comme [Render](https://render.com/), [Heroku](https://www.heroku.com/), ou un VPS. Configurez les variables d'environnement (`DATABASE_URL`, `JWT_SECRET`) sur la plateforme d'hébergement.
 
 ## 9. Structure du Dépôt
+```bash
 
 AI4CKD-Hackathon/
 ├── backend/
@@ -246,7 +247,7 @@ AI4CKD-Hackathon/
 ├── .gitignore                  # Fichiers et dossiers à ignorer par Git
 ├── README.md                   # Ce fichier
 └── Cahier des Charges - Projet AI4CKD Hackathon.pdf # Document de référence
-
+```
 
 
 ## 10. Livrables (Hackathon)
