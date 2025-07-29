@@ -21,7 +21,7 @@ export default function Navbar() { // Exportez-le comme default
         {isAuthenticated ? (
           <>
             <li>
-              <span className="text-white mx-2.5">Bienvenue, {user?.email}</span>
+              <span className="text-white mx-2.5">{user?.email}</span>
             </li>
             <li>
               <button onClick={logout} className="hover:underline">
